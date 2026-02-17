@@ -23,19 +23,22 @@ We could duplicate a `CLAUDE.md` in every repo, but that creates a maintenance p
 
 ## The Structure
 
-The solution is a shared `claude/` directory that sits at the workspace root, above the individual repos:
+The solution is a `claude/` directory that lives in the Documentation repository — the one repo dedicated to project-wide knowledge — and is symlinked to the workspace root so every repo can see it:
 
 ```
 ~/WorldsOfTheNextRealm/
-├── CLAUDE.md                          # Root hub — core rules + links
-├── claude/
-│   ├── repo-structure.md              # Where code lives across repos
-│   ├── build-commands.md              # How to build each repo type
-│   ├── cdk-patterns.md                # CDK conventions and gotchas
-│   ├── debugging.md                   # Known issues and fixes
-│   ├── permissions.md                 # What Claude can/can't do
-│   ├── pr-workflow.md                 # PR creation checklist
-│   └── memory.md                      # Persistent cross-session context
+├── CLAUDE.md -> claude/CLAUDE.md      # Symlink to the hub file
+├── claude/ -> WorldsOfTheNextRealm.Documentation/claude/  # Symlink
+├── WorldsOfTheNextRealm.Documentation/
+│   └── claude/                        # The real files live here (under git)
+│       ├── CLAUDE.md                  # Core rules + links to satellites
+│       ├── repo-structure.md          # Where code lives across repos
+│       ├── build-commands.md          # How to build each repo type
+│       ├── cdk-patterns.md            # CDK conventions and gotchas
+│       ├── debugging.md              # Known issues and fixes
+│       ├── permissions.md             # What Claude can/can't do
+│       ├── pr-workflow.md             # PR creation checklist
+│       └── memory.md                  # Persistent cross-session context
 ├── WorldsOfTheNextRealm.BackendApi/
 ├── WorldsOfTheNextRealm.BackendCommon/
 ├── WorldsOfTheNextRealm.FrontEndClient/
@@ -47,7 +50,13 @@ The solution is a shared `claude/` directory that sits at the workspace root, ab
 └── ... (other repos)
 ```
 
-When Claude Code opens any repo under this workspace, it picks up the root `CLAUDE.md` automatically. That root file is short — it states the core rules and links to the satellite files for details.
+The key detail is the symlinks. The `claude/` directory at the workspace root is a soft link pointing to `WorldsOfTheNextRealm.Documentation/claude/`. The root `CLAUDE.md` is itself a symlink to `claude/CLAUDE.md`. This means:
+
+1. **The Documentation repo is the single source of truth.** The actual files are committed and maintained under git control in the Documentation repository.
+2. **Changes go through PRs.** Updating a rule means editing a file in the Documentation repo, creating a PR, and merging — the same process as any other code change.
+3. **Every workspace gets the rules automatically.** When Claude Code opens any repo under this workspace, the symlinked `CLAUDE.md` is picked up as if it were a local file. No duplication, no synchronization scripts, no risk of drift.
+
+The root `CLAUDE.md` is short — it states the core rules and links to the satellite files for details.
 
 ## The Root CLAUDE.md
 
@@ -143,7 +152,7 @@ The other 9 repos have no `CLAUDE.md` of their own. They inherit everything from
 
 ## Why This Works
 
-**Single source of truth.** When a rule changes, we update one file. All repos pick it up immediately.
+**Single source of truth.** The files live in the Documentation repo under git control, symlinked to the workspace root. When a rule changes, we update one file via PR. All repos pick it up immediately through the symlink — no synchronization, no copying.
 
 **Lazy loading.** Claude doesn't read all satellite files upfront. It reads the root `CLAUDE.md` (which is short) and follows links only when relevant. This preserves context window space for actual code.
 
@@ -151,11 +160,17 @@ The other 9 repos have no `CLAUDE.md` of their own. They inherit everything from
 
 **Every rule has a story.** We don't add speculative rules. Every entry in every satellite file exists because something went wrong without it. The ALB outbound rule in `cdk-patterns.md` exists because health checks silently failed. The "never defer stats" rule in `pr-workflow.md` exists because stats were forgotten. This keeps the files lean — no hypothetical guidance, only battle-tested rules.
 
-**It evolves through PRs.** Changes to the `claude/` directory go through the same PR process as code changes. This creates a history of *why* rules were added, which is useful when reviewing whether a rule is still relevant.
+**It evolves through PRs.** Since the files live in the Documentation repo, changes go through the same PR process as any other code change. This creates a history of *why* rules were added, which is useful when reviewing whether a rule is still relevant.
+
+## Why the Documentation Repo?
+
+The `claude/` directory lives in the Documentation repository rather than in a standalone config repo or as loose files at the workspace root. This was a deliberate choice.
+
+The Documentation repo is already the home for project-wide knowledge — design documents, game data definitions, and technical specs. The AI's operating rules are project-wide knowledge too. Putting them in the same repo means they go through the same PR review process, appear in the same commit history, and are maintained by the same workflow.
+
+The symlink approach means the Documentation repo serves double duty: it's both the canonical source for the files (under git control, with PR history) and the provider of those files to every other workspace via the soft link. When Claude opens the Documentation repo directly, the `claude/` directory is right there. When Claude opens any other repo, the symlink at the workspace root resolves to the same files. One set of files, two access paths, zero duplication.
 
 ## What We'd Do Differently
-
-The Documentation repo currently has its own copy of the `claude/` directory — identical files mirrored from the root. This was done because the Documentation repo is sometimes opened as a standalone workspace outside the shared root. It works, but it means manual synchronization when the shared files change. A better approach might be symlinks or a script that copies on change.
 
 The satellite file names are functional but not discoverable. If you don't read the root `CLAUDE.md` first, you wouldn't know `cdk-patterns.md` exists. This hasn't been a problem for Claude (it reads the root file), but it could confuse a human contributor looking at the directory.
 
