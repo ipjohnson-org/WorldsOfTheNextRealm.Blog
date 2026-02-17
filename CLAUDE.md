@@ -8,6 +8,18 @@ Hugo static site deployed via GitHub Pages. Part of the WorldsOfTheNextRealm mul
 - **Always** ask before deleting files or force-pushing.
 - **Never** look in or modify files/directories above the root directory.
 
+## Project Context
+- **This is a commercial project, not open source.** The game will be monetized. Never describe the project or its code as "open source" in blog posts or documentation.
+- The blog itself is public, but it documents a commercial game development effort.
+
+## Blog Authoring Workflow
+The blog follows a human-directed, AI-authored workflow:
+1. **The user suggests a topic** — they provide the subject, key points, and any specific angles to cover.
+2. **Claude writes the post** — drafting the full content based on the user's direction and knowledge of the project.
+3. **The user fact-checks** — the user reviews the post for accuracy before it merges. Claude should write honestly and flag anything it's uncertain about rather than fabricating details.
+4. **Screenshots** — if a post would benefit from screenshots, diagrams, or images, Claude must **ask the user to provide them** rather than assuming they exist. Never reference images that haven't been provided.
+5. **Claude handles the PR workflow** — commit, push, create PR, review comment, and stats comment.
+
 ## Content Authoring
 
 ### Creating a New Post
