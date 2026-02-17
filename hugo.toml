@@ -99,4 +99,20 @@ hasCJKLanguage         = false
             enabled = true
 
     [params.comments]
-        enabled = false
+        enabled = true
+        provider = "giscus"
+
+        [params.comments.giscus]
+            repo               = "ipjohnson-org/WorldsOfTheNextRealm.Blog"
+            repoID             = "R_kgDORShc1g"
+            category           = "General"
+            categoryID         = "DIC_kwDORShc1s4C2pjC"
+            mapping            = "pathname"
+            lightTheme         = "light"
+            darkTheme          = "dark_dimmed"
+            reactionsEnabled   = 1
+            emitMetadata       = 0
+            inputPosition      = "top"
+            lang               = "en"
+            strict             = 0
+            loading            = "lazy"
