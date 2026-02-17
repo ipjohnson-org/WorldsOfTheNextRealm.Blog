@@ -82,7 +82,7 @@ That parallel isn't accidental. Working with AI tools every day gives us direct 
 
 ## Follow Along
 
-All of our code is open source under the [ipjohnson-org](https://github.com/ipjohnson-org) GitHub organization. You can see every PR, every commit, every review comment.
+You can follow our development on the [ipjohnson-org](https://github.com/ipjohnson-org) GitHub organization, where we track PRs, commits, and review comments in the open.
 
 This blog is itself a GitHub Pages site, built with Hugo and the Stack theme, deployed via GitHub Actions. The source is in the [WorldsOfTheNextRealm.Blog](https://github.com/ipjohnson-org/WorldsOfTheNextRealm.Blog) repo. Even the blog posts go through PRs.
 
